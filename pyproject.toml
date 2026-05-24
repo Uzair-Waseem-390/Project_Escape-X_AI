@@ -11,5 +11,7 @@ dependencies = [
     "django-redis>=6.0.0",
     "djangorestframework>=3.17.1",
     "djangorestframework-simplejwt>=5.5.1",
+    "dotenv>=0.9.9",
+    "pathlib>=1.0.1",
     "redis>=7.4.0",
 ]
