@@ -1,18 +1,14 @@
 /**
- * StatsOverview — 4 stat cards in a grid.
+ * StatsOverview — 2 large stat cards filling the full space.
  */
 const STATS = [
     { key: "total", label: "TOTAL MISSIONS", icon: "🚀", color: "var(--cyan-400)" },
-    { key: "passed", label: "PASSED", icon: "✅", color: "#4caf50" },
-    { key: "failed", label: "FAILED", icon: "❌", color: "var(--red-400)" },
     { key: "unlocked", label: "LEVELS UNLOCKED", icon: "🔓", color: "var(--amber-400, #ffb300)" },
 ];
 
-const StatsOverview = ({ totalSessions, totalPassed, totalFailed, highestUnlocked }) => {
+const StatsOverview = ({ totalSessions, highestUnlocked }) => {
     const values = {
         total: totalSessions,
-        passed: totalPassed,
-        failed: totalFailed,
         unlocked: `${highestUnlocked}/5`,
     };
 
@@ -30,19 +26,26 @@ const StatsOverview = ({ totalSessions, totalPassed, totalFailed, highestUnlocke
                     style={{
                         background: "var(--bg-card)",
                         border: `1px solid rgba(255,255,255,0.06)`,
-                        borderRadius: 6,
-                        padding: "1rem 1.1rem",
+                        borderRadius: 8,
+                        padding: "1.75rem 1.25rem",
                         textAlign: "center",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "0.5rem",
+                        minHeight: 140,
                     }}
                 >
-                    <div style={{ fontSize: "1.3rem", marginBottom: "0.3rem" }}>{stat.icon}</div>
+                    <div style={{ fontSize: "2rem" }}>{stat.icon}</div>
                     <div
                         className="font-display"
                         style={{
-                            fontSize: "1.4rem",
+                            fontSize: "2rem",
                             fontWeight: 800,
                             color: stat.color,
                             letterSpacing: "0.04em",
+                            lineHeight: 1,
                         }}
                     >
                         {values[stat.key]}
@@ -50,9 +53,9 @@ const StatsOverview = ({ totalSessions, totalPassed, totalFailed, highestUnlocke
                     <div
                         className="font-mono"
                         style={{
-                            fontSize: "0.55rem",
+                            fontSize: "0.6rem",
                             color: "var(--grey-400)",
-                            letterSpacing: "0.1em",
+                            letterSpacing: "0.12em",
                             textTransform: "uppercase",
                         }}
                     >

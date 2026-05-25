@@ -3,6 +3,7 @@ import { useState } from "react";
 import SceneStateSystem from "../components/cutscenes/SceneStateSystem";
 import SkipButton from "../components/ui/SkipButton";
 import StarField from "../components/ui/StarField";
+import { Button } from "../components/ui/UIKit";
 
 import LEVEL_1_FAILURE_SCENES from "../components/cutscenes/Level1FailureScene";
 import LEVEL_2_FAILURE_SCENES from "../components/cutscenes/Level2FailureScene";
@@ -27,7 +28,7 @@ const SYSTEM_NAMES = {
 };
 
 /**
- * LevelFailure — Shown when a level is failed (time up or score too low).
+ * LevelFailure — Shown when a level is failed.
  * Route: /level/:id/failure
  */
 const LevelFailure = () => {
@@ -42,7 +43,7 @@ const LevelFailure = () => {
     const handleComplete = () => {
         if (isComplete) return;
         setIsComplete(true);
-        // Retry — go back to level intro then play
+        // Retry — go back to level intro
         navigate(`/level/${levelId}/intro`, { replace: true });
     };
 
@@ -83,6 +84,17 @@ const LevelFailure = () => {
                 >
                     LEVEL {levelId} FAILED · {systemName}
                 </span>
+            </div>
+
+            {/* Dashboard button */}
+            <div style={{ position: "fixed", top: "1.25rem", right: "5rem", zIndex: 100 }}>
+                <Button
+                    variant="secondary"
+                    onClick={() => navigate("/dashboard")}
+                    style={{ padding: "8px 16px", fontSize: "0.62rem", letterSpacing: "0.08em" }}
+                >
+                    ← DASHBOARD
+                </Button>
             </div>
 
             <SkipButton onSkip={handleSkip} label="SKIP & RETRY" />

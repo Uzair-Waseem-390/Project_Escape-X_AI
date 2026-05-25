@@ -3,6 +3,7 @@ import { useState } from "react";
 import SceneStateSystem from "../components/cutscenes/SceneStateSystem";
 import SkipButton from "../components/ui/SkipButton";
 import StarField from "../components/ui/StarField";
+import { Button } from "../components/ui/UIKit";
 import getSuccessScenes from "../components/cutscenes/LevelSuccessScene";
 
 const SYSTEM_NAMES = {
@@ -34,7 +35,6 @@ const LevelSuccess = () => {
         setIsComplete(true);
 
         if (isLastLevel) {
-            // Final ending — navigate to ending page (will be built later)
             navigate("/ending", { replace: true });
         } else {
             // Go to next level intro
@@ -82,6 +82,17 @@ const LevelSuccess = () => {
                 >
                     ✓ LEVEL {levelId} COMPLETE · {systemName}
                 </span>
+            </div>
+
+            {/* Dashboard button */}
+            <div style={{ position: "fixed", top: "1.25rem", right: "5rem", zIndex: 100 }}>
+                <Button
+                    variant="secondary"
+                    onClick={() => navigate("/dashboard")}
+                    style={{ padding: "8px 16px", fontSize: "0.62rem", letterSpacing: "0.08em" }}
+                >
+                    ← DASHBOARD
+                </Button>
             </div>
 
             <SkipButton onSkip={handleSkip} label={isLastLevel ? "SKIP TO ENDING" : "SKIP TO NEXT"} />

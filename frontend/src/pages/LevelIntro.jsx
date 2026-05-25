@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import SceneStateSystem from "../components/cutscenes/SceneStateSystem";
 import SkipButton from "../components/ui/SkipButton";
 import StarField from "../components/ui/StarField";
+import { Button } from "../components/ui/UIKit";
 
 // Cutscene data imports
 import LEVEL_1_SCENES from "../components/cutscenes/Level1Cutscene";
@@ -30,7 +31,6 @@ const LEVEL_TITLES = {
 /**
  * LevelIntro — Cutscene page shown before each level.
  * Route: /level/:id/intro
- * Shows animated story sequence, then navigates to gameplay.
  */
 const LevelIntro = () => {
     const { id } = useParams();
@@ -51,7 +51,6 @@ const LevelIntro = () => {
     const handleComplete = () => {
         if (isComplete) return;
         setIsComplete(true);
-        // Navigate to gameplay page (will be built in Phase 3)
         navigate(`/level/${levelId}/play`, { replace: true });
     };
 
@@ -65,7 +64,6 @@ const LevelIntro = () => {
 
     return (
         <div style={{ position: "relative", minHeight: "100vh", background: "var(--bg-primary)", overflow: "hidden" }}>
-            {/* Starfield background */}
             <StarField />
             <div className="noise-overlay" />
 
@@ -93,6 +91,17 @@ const LevelIntro = () => {
                 >
                     LEVEL {levelId} · {levelTitle}
                 </span>
+            </div>
+
+            {/* Back to Dashboard button */}
+            <div style={{ position: "fixed", top: "1.25rem", right: "5rem", zIndex: 100 }}>
+                <Button
+                    variant="secondary"
+                    onClick={() => navigate("/dashboard")}
+                    style={{ padding: "8px 16px", fontSize: "0.62rem", letterSpacing: "0.08em" }}
+                >
+                    ← DASHBOARD
+                </Button>
             </div>
 
             {/* Skip button */}

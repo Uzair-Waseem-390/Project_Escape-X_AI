@@ -9,6 +9,7 @@ import StatsOverview from "../components/dashboard/StatsOverview";
 import LevelProgressCard from "../components/dashboard/LevelProgressCard";
 import SubjectRadar from "../components/dashboard/SubjectRadar";
 import RecentSessions from "../components/dashboard/RecentSessions";
+// import QuickStartCard from "../components/dashboard/QuickStartCard";
 import QuickStartCard from "../components/dashboard/QuickStartCard";
 
 /**
@@ -201,7 +202,6 @@ const Dashboard = () => {
                     {/* Top-left: Quick Start */}
                     <QuickStartCard
                         highestUnlocked={highestUnlocked}
-                        nextLevel={nextLevel}
                         allLevelsPassed={allLevelsPassed}
                         hasActiveSession={!!activeSession}
                         activeSessionLevel={activeSession?.level}

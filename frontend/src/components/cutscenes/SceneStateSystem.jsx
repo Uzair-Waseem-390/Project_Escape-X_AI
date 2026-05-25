@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
  *     type: "text" | "alert" | "action"
  *   onComplete: Called when all scenes finish
  *   onSkip: Called when user skips
+ * 
+ * All scenes advance ONLY on user click/press (no auto-advance).
  */
 
 const sceneVariants = {
@@ -28,16 +30,6 @@ const SceneStateSystem = ({ scenes, onComplete, onSkip }) => {
             onComplete?.();
         }
     }, [currentIndex, scenes.length, isComplete, onComplete]);
-
-    // Auto-advance based on duration
-    useEffect(() => {
-        if (isComplete) return;
-        const scene = scenes[currentIndex];
-        if (!scene?.duration) return;
-
-        const timer = setTimeout(advance, scene.duration);
-        return () => clearTimeout(timer);
-    }, [currentIndex, scenes, advance, isComplete]);
 
     // Keyboard: Space or Enter to advance, Escape to skip
     useEffect(() => {
@@ -260,7 +252,7 @@ const SceneStateSystem = ({ scenes, onComplete, onSkip }) => {
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 0.5 }}
-                    transition={{ delay: 2, duration: 0.8 }}
+                    transition={{ delay: 1.5, duration: 0.8 }}
                     style={{
                         position: "absolute",
                         bottom: "3rem",
@@ -279,7 +271,7 @@ const SceneStateSystem = ({ scenes, onComplete, onSkip }) => {
                             letterSpacing: "0.15em",
                         }}
                     >
-                        CLICK OR PRESS SPACE TO CONTINUE
+                        CLICK ANYWHERE OR PRESS SPACE TO CONTINUE
                     </span>
                     <motion.div
                         animate={{ y: [0, 6, 0] }}
@@ -293,7 +285,7 @@ const SceneStateSystem = ({ scenes, onComplete, onSkip }) => {
                 </motion.div>
             )}
 
-            {/* Click anywhere to advance */}
+            {/* Click anywhere to advance (covers full screen for text/alert scenes) */}
             {currentScene.type !== "action" && (
                 <div
                     onClick={advance}
