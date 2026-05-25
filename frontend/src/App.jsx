@@ -1,7 +1,9 @@
+import LandingPage from "./pages/LandingPage";
+
+/**
+ * App — Root component.
+ * All routing will live here once game pages are added.
+ */
 export default function App() {
-  return (
-    <h1 className="text-4xl font-bold text-blue-500">
-      Tailwind is working
-    </h1>
-  )
+  return <LandingPage />;
 }

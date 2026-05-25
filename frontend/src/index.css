@@ -1,1 +1,420 @@
+/* ── Google Fonts ─────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Share+Tech+Mono&display=swap');
+
+/* ── Tailwind CSS ─────────────────────────────────── */
 @import "tailwindcss";
+
+
+/* ── CSS Custom Properties (from theme.js) ───────── */
+:root {
+  --bg-primary: #0a0b0d;
+  --bg-secondary: #0f1114;
+  --bg-card: #13161a;
+  --red-400: #ff5252;
+  --red-500: #e53935;
+  --red-600: #c62828;
+  --red-glow: rgba(229, 57, 53, 0.35);
+  --red-subtle: rgba(229, 57, 53, 0.08);
+  --cyan-400: #26c6da;
+  --cyan-500: #00bcd4;
+  --cyan-glow: rgba(0, 188, 212, 0.25);
+  --grey-700: #1e2126;
+  --grey-600: #272c33;
+  --grey-400: #5a636e;
+  --grey-300: #8a95a0;
+  --grey-200: #b0bbc5;
+  --white: #f0f4f8;
+  --font-display: 'Orbitron', 'Share Tech Mono', monospace;
+  --font-heading: 'Rajdhani', 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', 'IBM Plex Sans', sans-serif;
+  --font-mono: 'Share Tech Mono', 'Courier New', monospace;
+  --shadow-red: 0 0 20px rgba(229, 57, 53, 0.4), 0 0 60px rgba(229, 57, 53, 0.15);
+  --shadow-cyan: 0 0 20px rgba(0, 188, 212, 0.4), 0 0 60px rgba(0, 188, 212, 0.15);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+}
+
+/* ── Base Reset ───────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ── Custom Scrollbar ─────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0b0d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--red-600);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--red-500);
+}
+
+/* ── Selection ────────────────────────────────────── */
+::selection {
+  background: var(--red-glow);
+  color: var(--white);
+}
+
+/* ── Typography Helpers ───────────────────────────── */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* ── Glow Utilities ───────────────────────────────── */
+.glow-red {
+  text-shadow: 0 0 20px var(--red-glow), 0 0 40px var(--red-glow);
+}
+
+.glow-cyan {
+  text-shadow: 0 0 20px var(--cyan-glow), 0 0 40px var(--cyan-glow);
+}
+
+/* ── Star field background ────────────────────────── */
+.stars-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ── Noise overlay ────────────────────────────────── */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ── Section anchor offset ────────────────────────── */
+section[id] {
+  scroll-margin-top: 80px;
+}
+
+/* ── HUD border line ──────────────────────────────── */
+.hud-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--red-500), transparent);
+}
+
+/* ── Scanline effect ──────────────────────────────── */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Animations ───────────────────────────────────── */
+@keyframes pulse-red {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes blink-cursor {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes rotate-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    top: -10%;
+  }
+
+  100% {
+    top: 110%;
+  }
+}
+
+@keyframes flicker {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  92% {
+    opacity: 1;
+  }
+
+  93% {
+    opacity: 0.4;
+  }
+
+  94% {
+    opacity: 1;
+  }
+
+  96% {
+    opacity: 0.6;
+  }
+
+  97% {
+    opacity: 1;
+  }
+}
+
+@keyframes twinkle {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-pulse-red {
+  animation: pulse-red 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-rotate-slow {
+  animation: rotate-slow 20s linear infinite;
+}
+
+.animate-flicker {
+  animation: flicker 8s ease-in-out infinite;
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.6s ease forwards;
+}
+
+/* ── Gradient text ────────────────────────────────── */
+.gradient-text-red {
+  background: linear-gradient(135deg, #ff5252 0%, #e53935 50%, #ff8a80 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-cyan {
+  background: linear-gradient(135deg, #26c6da 0%, #00bcd4 50%, #80deea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Card border glow ─────────────────────────────── */
+.card-border-red {
+  border: 1px solid rgba(229, 57, 53, 0.2);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-border-red:hover {
+  border-color: rgba(229, 57, 53, 0.5);
+  box-shadow: 0 0 20px rgba(229, 57, 53, 0.15), 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Button base ──────────────────────────────────── */
+.btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, var(--red-600), var(--red-500));
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-primary:hover {
+  box-shadow: var(--shadow-red);
+  transform: translateY(-2px);
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 30px;
+  background: transparent;
+  color: var(--cyan-400);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid rgba(38, 198, 218, 0.4);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+.btn-secondary:hover {
+  background: rgba(38, 198, 218, 0.08);
+  border-color: var(--cyan-400);
+  box-shadow: var(--shadow-cyan);
+  transform: translateY(-2px);
+}
+
+/* ── HUD tag ──────────────────────────────────────── */
+.hud-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: var(--red-subtle);
+  border: 1px solid rgba(229, 57, 53, 0.3);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--red-400);
+}
+
+/* ── Progress bar ─────────────────────────────────── */
+.progress-bar {
+  height: 4px;
+  background: var(--grey-700);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--red-600), var(--red-400));
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--red-glow);
+  transition: width 1s ease;
+}
