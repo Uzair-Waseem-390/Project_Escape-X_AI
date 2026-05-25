@@ -2,6 +2,7 @@ import { useEffect, useCallback, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGameSession } from "../hooks/useGameSession";
 import { useAuth } from "../hooks/useAuth";
+import { gameAPI } from "../api/game";
 import StarField from "../components/ui/StarField";
 import TimerBar from "../components/game/TimerBar";
 import ScoreDisplay from "../components/game/ScoreDisplay";
@@ -20,6 +21,7 @@ const LevelPlayPage = () => {
     const levelId = parseInt(id);
     const { isAuthenticated, loading: authLoading } = useAuth();
     const [showExitConfirm, setShowExitConfirm] = useState(false);
+    const [exiting, setExiting] = useState(false);
 
     const {
         session,
@@ -38,6 +40,7 @@ const LevelPlayPage = () => {
         startSession,
         submitAnswer,
         nextQuestion,
+        abandonSession,
     } = useGameSession(levelId);
 
     // Start session on mount
@@ -78,8 +81,10 @@ const LevelPlayPage = () => {
         setShowExitConfirm(true);
     };
 
-    const confirmExit = () => {
-        // Navigate back to level intro
+    const confirmExit = async () => {
+        setExiting(true);
+        // Close session silently — no completion flow triggered
+        await abandonSession();
         navigate(`/level/${levelId}/intro`, { replace: true });
     };
 
@@ -143,6 +148,7 @@ const LevelPlayPage = () => {
                         {/* Exit button */}
                         <button
                             onClick={handleExit}
+                            disabled={exiting}
                             className="btn-secondary"
                             style={{
                                 padding: "6px 14px",
@@ -150,9 +156,11 @@ const LevelPlayPage = () => {
                                 letterSpacing: "0.08em",
                                 borderColor: "rgba(229,57,53,0.4)",
                                 color: "var(--red-400)",
+                                opacity: exiting ? 0.5 : 1,
+                                cursor: exiting ? "wait" : "pointer",
                             }}
                         >
-                            ✕ EXIT
+                            {exiting ? "EXITING..." : "✕ EXIT"}
                         </button>
                     </div>
                 </div>
@@ -233,18 +241,20 @@ const LevelPlayPage = () => {
                             className="font-body"
                             style={{ fontSize: "0.85rem", color: "var(--grey-400)", lineHeight: 1.6, marginBottom: "1.5rem" }}
                         >
-                            Your current progress on Level {levelId} will be lost. You can restart this level anytime from the dashboard.
+                            Your current progress on Level {levelId} will be lost. This session will be closed and you'll start fresh when you re-enter.
                         </p>
                         <div style={{ display: "flex", gap: "0.75rem" }}>
                             <button
                                 onClick={confirmExit}
+                                disabled={exiting}
                                 className="btn-primary"
-                                style={{ flex: 1, padding: "12px 20px", fontSize: "0.8rem" }}
+                                style={{ flex: 1, padding: "12px 20px", fontSize: "0.8rem", opacity: exiting ? 0.6 : 1 }}
                             >
-                                YES, EXIT
+                                {exiting ? "CLOSING..." : "YES, EXIT"}
                             </button>
                             <button
                                 onClick={cancelExit}
+                                disabled={exiting}
                                 className="btn-secondary"
                                 style={{ flex: 1, padding: "12px 20px", fontSize: "0.8rem" }}
                             >

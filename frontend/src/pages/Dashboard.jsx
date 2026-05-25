@@ -9,7 +9,6 @@ import StatsOverview from "../components/dashboard/StatsOverview";
 import LevelProgressCard from "../components/dashboard/LevelProgressCard";
 import SubjectRadar from "../components/dashboard/SubjectRadar";
 import RecentSessions from "../components/dashboard/RecentSessions";
-// import QuickStartCard from "../components/dashboard/QuickStartCard";
 import QuickStartCard from "../components/dashboard/QuickStartCard";
 
 /**
@@ -46,7 +45,7 @@ const Dashboard = () => {
             ]);
             setProgress(progressData);
             setAnalytics(analyticsData || []);
-            setSessions((sessionsData || []).slice(0, 10)); // Last 10 sessions
+            setSessions((sessionsData || []).slice(0, 10));
         } catch (err) {
             setError("Failed to load mission data. Please try again.");
         } finally {
@@ -64,12 +63,8 @@ const Dashboard = () => {
 
     // ── Derived values ────────────────────────────────────────────────
     const highestUnlocked = progress?.highest_level_unlocked || 1;
-    const nextLevel = highestUnlocked;
-    const allLevelsPassed = highestUnlocked > 5 || (progress?.highest_level_unlocked === 5 && sessions.some(s => s.status === "passed" && s.level === 5));
+    const allLevelsPassed = highestUnlocked > 5;
     const totalSessions = sessions.length;
-    const totalPassed = sessions.filter((s) => s.status === "passed").length;
-    const totalFailed = sessions.filter((s) => s.status === "failed" || s.status === "timed_out").length;
-    const activeSession = sessions.find((s) => s.status === "in_progress");
 
     const handleLogout = async () => {
         await logout();
@@ -157,38 +152,6 @@ const Dashboard = () => {
                     </div>
                 )}
 
-                {/* Active session alert */}
-                {activeSession && (
-                    <div
-                        style={{
-                            background: "rgba(255,179,0,0.06)",
-                            border: "1px solid rgba(255,179,0,0.25)",
-                            borderRadius: 6,
-                            padding: "1rem 1.25rem",
-                            marginBottom: "1.5rem",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            flexWrap: "wrap",
-                            gap: "0.75rem",
-                        }}
-                    >
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                            <span style={{ fontSize: "1.2rem" }}>⚠</span>
-                            <span className="font-mono" style={{ fontSize: "0.75rem", color: "var(--amber-400, #ffb300)", letterSpacing: "0.06em" }}>
-                                ACTIVE MISSION: LEVEL {activeSession.level} — IN PROGRESS
-                            </span>
-                        </div>
-                        <Button
-                            variant="primary"
-                            onClick={() => navigate(`/level/${activeSession.level}/play`)}
-                            style={{ padding: "8px 20px", fontSize: "0.7rem" }}
-                        >
-                            RESUME MISSION ▸
-                        </Button>
-                    </div>
-                )}
-
                 {/* Main grid */}
                 <div
                     style={{
@@ -203,17 +166,12 @@ const Dashboard = () => {
                     <QuickStartCard
                         highestUnlocked={highestUnlocked}
                         allLevelsPassed={allLevelsPassed}
-                        hasActiveSession={!!activeSession}
-                        activeSessionLevel={activeSession?.level}
                         onStartLevel={(level) => navigate(`/level/${level}/intro`)}
-                        onResumeSession={() => navigate(`/level/${activeSession.level}/play`)}
                     />
 
                     {/* Top-right: Stats Overview */}
                     <StatsOverview
                         totalSessions={totalSessions}
-                        totalPassed={totalPassed}
-                        totalFailed={totalFailed}
                         highestUnlocked={highestUnlocked}
                     />
 

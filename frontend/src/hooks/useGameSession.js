@@ -190,6 +190,27 @@ export const useGameSession = (levelId) => {
         }
     }, [session, currentSubject, phase]);
 
+    // ── Abandon session (exit without completing) ──────────────────────
+    const abandonSession = useCallback(async () => {
+        if (!session) return;
+
+        setIsTimerActive(false);
+        clearInterval(levelTimerRef.current);
+
+        // Stop current subject timer
+        try {
+            await gameAPI.updateTimer(session.id, currentSubject, "stop");
+        } catch { }
+
+        // Mark session as failed/completed on backend
+        try {
+            await gameAPI.completeLevel(session.id);
+        } catch { }
+
+        // Don't set phase to "completed" — just reset locally
+        setSession(null);
+    }, [session, currentSubject]);
+
     // ── Derived values ─────────────────────────────────────────────────
     const currentQuestion = session?.session_questions?.[currentQuestionIndex];
     const totalQuestions = session?.session_questions?.length || 15;
@@ -218,5 +239,6 @@ export const useGameSession = (levelId) => {
         submitAnswer,
         nextQuestion,
         handleCompleteLevel,
+        abandonSession,
     };
 };
