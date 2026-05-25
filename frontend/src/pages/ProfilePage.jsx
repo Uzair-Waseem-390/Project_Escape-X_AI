@@ -28,14 +28,12 @@ const ProfilePage = () => {
         return () => clearTimeout(t);
     }, []);
 
-    // Redirect if not authenticated
     useEffect(() => {
         if (!loading && !isAuthenticated) {
             navigate("/login", { replace: true });
         }
     }, [loading, isAuthenticated, navigate]);
 
-    // Populate form when user data loads
     useEffect(() => {
         if (user) {
             setForm({
@@ -67,6 +65,7 @@ const ProfilePage = () => {
         e.preventDefault();
         setServerError("");
         setSuccessMsg("");
+        setErrors({});
         if (!validate()) return;
 
         setSubmitting(true);
@@ -77,19 +76,35 @@ const ProfilePage = () => {
                 age: parseInt(form.age),
                 gender: form.gender,
             });
-            updateUser(response.data);
-            setSuccessMsg("Profile updated successfully, Cadet.");
+            if (response.data) {
+                updateUser(response.data);
+            }
+            setSuccessMsg(response.message || "Profile updated successfully, Cadet.");
             setEditing(false);
         } catch (err) {
-            const data = err.response?.data;
-            if (data && typeof data === "object") {
-                const fieldErrors = {};
-                Object.entries(data).forEach(([key, value]) => {
-                    fieldErrors[key] = Array.isArray(value) ? value[0] : value;
-                });
-                setErrors((prev) => ({ ...prev, ...fieldErrors }));
+            console.error("Profile update error:", err);
+
+            const responseData = err.response?.data;
+
+            if (responseData) {
+                if (responseData.details && typeof responseData.details === "object") {
+                    const fieldErrors = {};
+                    Object.entries(responseData.details).forEach(([key, value]) => {
+                        fieldErrors[key] = Array.isArray(value) ? value[0] : value;
+                    });
+                    setErrors(fieldErrors);
+                }
+
+                if (responseData.error) {
+                    setServerError(responseData.error);
+                } else if (responseData.message) {
+                    setServerError(responseData.message);
+                } else {
+                    setServerError("Failed to update profile.");
+                }
+            } else {
+                setServerError("Failed to update profile. Please try again.");
             }
-            setServerError(data?.message || "Failed to update profile.");
         } finally {
             setSubmitting(false);
         }
@@ -191,7 +206,7 @@ const ProfilePage = () => {
                                             ))}
                                         </select>
                                     ) : (
-                                        <input type="text" value={user.gender_display || form.gender} disabled style={inputStyle()} />
+                                        <input type="text" value={form.gender ? form.gender.replace(/_/g, " ") : ""} disabled style={inputStyle()} />
                                     )}
                                     {errors.gender && <span className="font-mono" style={{ fontSize: "0.62rem", color: "var(--red-400)", marginTop: 4, display: "block" }}>{errors.gender}</span>}
                                 </div>
@@ -203,24 +218,52 @@ const ProfilePage = () => {
                                 <input type="text" value={user.date_joined ? new Date(user.date_joined).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "—"} disabled style={{ ...inputStyle(), cursor: "not-allowed", opacity: 0.6 }} />
                             </div>
 
-                            {/* Actions */}
-                            <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-                                {editing ? (
-                                    <>
-                                        <Button type="submit" variant="primary" disabled={submitting} style={{ flex: 1, padding: "12px 20px", fontSize: "0.8rem" }}>
-                                            {submitting ? "SAVING..." : "✓ SAVE CHANGES"}
-                                        </Button>
-                                        <Button type="button" variant="secondary" onClick={() => { setEditing(false); setErrors({}); setServerError(""); }} style={{ flex: 1, padding: "12px 20px", fontSize: "0.8rem" }}>
-                                            CANCEL
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <Button type="button" variant="primary" onClick={() => setEditing(true)} style={{ flex: 1, padding: "12px 20px", fontSize: "0.8rem" }}>
-                                        ✏️ EDIT PROFILE
+                            {/* Action buttons — only show Save/Cancel when editing */}
+                            {editing && (
+                                <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
+                                    <Button type="submit" variant="primary" disabled={submitting} style={{ flex: 1, padding: "12px 20px", fontSize: "0.8rem" }}>
+                                        {submitting ? "SAVING..." : "✓ SAVE CHANGES"}
                                     </Button>
-                                )}
-                            </div>
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        onClick={() => {
+                                            setEditing(false);
+                                            setErrors({});
+                                            setServerError("");
+                                            setSuccessMsg("");
+                                            if (user) {
+                                                setForm({
+                                                    first_name: user.first_name || "",
+                                                    last_name: user.last_name || "",
+                                                    age: user.age?.toString() || "",
+                                                    gender: user.gender || "",
+                                                });
+                                            }
+                                        }}
+                                        style={{ flex: 1, padding: "12px 20px", fontSize: "0.8rem" }}
+                                    >
+                                        CANCEL
+                                    </Button>
+                                </div>
+                            )}
                         </form>
+
+                        {/* EDIT PROFILE button — OUTSIDE the form, only when not editing */}
+                        {!editing && (
+                            <Button
+                                type="button"
+                                variant="primary"
+                                onClick={() => {
+                                    setSuccessMsg("");
+                                    setServerError("");
+                                    setEditing(true);
+                                }}
+                                style={{ width: "100%", padding: "12px 20px", fontSize: "0.8rem", marginTop: "1rem" }}
+                            >
+                                ✏️ EDIT PROFILE
+                            </Button>
+                        )}
 
                         {/* Divider */}
                         <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "1.5rem 0" }}>

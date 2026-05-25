@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { Button, HUDTag, CornerBrackets } from "../components/ui/UIKit";
+import { Button, HUDTag } from "../components/ui/UIKit";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -39,6 +39,7 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setServerError("");
+        setErrors({});
         if (!validate()) return;
 
         setSubmitting(true);
@@ -46,13 +47,34 @@ const LoginPage = () => {
             await login(form.email, form.password);
             navigate("/dashboard", { replace: true });
         } catch (err) {
-            const status = err.response?.status;
-            if (status === 401) {
-                setServerError("Invalid email or password. Please try again.");
-            } else if (status === 400) {
-                setServerError("Please check your email and password.");
+            console.error("Login error:", err);
+
+            const responseData = err.response?.data;
+
+            if (responseData) {
+                if (responseData.details && typeof responseData.details === "object") {
+                    const fieldErrors = {};
+                    Object.entries(responseData.details).forEach(([key, value]) => {
+                        fieldErrors[key] = Array.isArray(value) ? value[0] : value;
+                    });
+                    setErrors(fieldErrors);
+                }
+
+                if (responseData.error) {
+                    setServerError(responseData.error);
+                } else if (responseData.detail) {
+                    setServerError(responseData.detail);
+                } else if (responseData.message) {
+                    setServerError(responseData.message);
+                } else if (err.response?.status === 401) {
+                    setServerError("Invalid email or password. Please try again.");
+                } else {
+                    setServerError("Login failed. Please check your credentials.");
+                }
+            } else if (err.response?.status === 0 || !err.response) {
+                setServerError("Cannot reach Mission Control. Is the backend running on port 8000?");
             } else {
-                setServerError("Connection lost with Mission Control. Retrying...");
+                setServerError("Login failed. Please try again.");
             }
         } finally {
             setSubmitting(false);
@@ -69,7 +91,6 @@ const LoginPage = () => {
         fontFamily: "var(--font-body)",
         fontSize: "0.9rem",
         outline: "none",
-        transition: "border-color 0.2s",
     });
 
     return (
@@ -127,24 +148,33 @@ const LoginPage = () => {
                     </p>
                 </div>
 
-                <CornerBrackets>
-                    <div
-                        style={{
-                            background: "rgba(15,17,20,0.95)",
-                            border: "1px solid rgba(229,57,53,0.15)",
-                            borderRadius: 6,
-                            padding: "2rem",
-                            backdropFilter: "blur(16px)",
-                        }}
-                    >
+                {/* Card — no CornerBrackets wrapper, using a stable border instead */}
+                <div
+                    style={{
+                        position: "relative",
+                        background: "rgba(15,17,20,0.95)",
+                        border: "1px solid rgba(229,57,53,0.2)",
+                        borderRadius: 6,
+                        padding: "2rem",
+                        backdropFilter: "blur(16px)",
+                        boxShadow: "0 4px 32px rgba(0,0,0,0.5)",
+                    }}
+                >
+                    {/* Corner brackets rendered as static pseudo-elements via inner divs */}
+                    <div style={{ position: "absolute", top: -1, left: -1, width: 16, height: 16, borderTop: "2px solid var(--red-400)", borderLeft: "2px solid var(--red-400)", pointerEvents: "none" }} />
+                    <div style={{ position: "absolute", top: -1, right: -1, width: 16, height: 16, borderTop: "2px solid var(--red-400)", borderRight: "2px solid var(--red-400)", pointerEvents: "none" }} />
+                    <div style={{ position: "absolute", bottom: -1, left: -1, width: 16, height: 16, borderBottom: "2px solid var(--red-400)", borderLeft: "2px solid var(--red-400)", pointerEvents: "none" }} />
+                    <div style={{ position: "absolute", bottom: -1, right: -1, width: 16, height: 16, borderBottom: "2px solid var(--red-400)", borderRight: "2px solid var(--red-400)", pointerEvents: "none" }} />
+
+                    {/* Error message container */}
+                    <div style={{ minHeight: 48, marginBottom: serverError ? "1.25rem" : 0 }}>
                         {serverError && (
                             <div
                                 style={{
                                     background: "var(--red-subtle)",
                                     border: "1px solid rgba(229,57,53,0.3)",
                                     borderRadius: 4,
-                                    padding: "0.8rem 1rem",
-                                    marginBottom: "1.5rem",
+                                    padding: "0.7rem 0.9rem",
                                 }}
                             >
                                 <span className="font-mono" style={{ fontSize: "0.75rem", color: "var(--red-400)" }}>
@@ -152,64 +182,59 @@ const LoginPage = () => {
                                 </span>
                             </div>
                         )}
+                    </div>
 
-                        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-                            <div>
-                                <label className="font-mono" style={{ fontSize: "0.65rem", color: "var(--grey-300)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 5 }}>
-                                    Email Address
-                                </label>
-                                <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="cadet@mission.space" style={inputStyle("email")} />
-                                {errors.email && <span className="font-mono" style={{ fontSize: "0.62rem", color: "var(--red-400)", marginTop: 4, display: "block" }}>{errors.email}</span>}
-                            </div>
-
-                            <div>
-                                <label className="font-mono" style={{ fontSize: "0.65rem", color: "var(--grey-300)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 5 }}>
-                                    Password
-                                </label>
-                                <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="••••••••" style={inputStyle("password")} />
-                                {errors.password && <span className="font-mono" style={{ fontSize: "0.62rem", color: "var(--red-400)", marginTop: 4, display: "block" }}>{errors.password}</span>}
-                            </div>
-
-                            <div style={{ marginTop: "0.25rem" }}>
-                                <Button type="submit" variant="primary" disabled={submitting} style={{ width: "100%", padding: "14px 24px", fontSize: "0.85rem" }}>
-                                    {submitting ? "AUTHENTICATING..." : "🔓 ACCESS MISSION CONTROL"}
-                                </Button>
-                            </div>
-                        </form>
-
-                        <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "1.5rem 0" }}>
-                            <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
-                            <span className="font-mono" style={{ fontSize: "0.65rem", color: "var(--grey-400)" }}>NEW CADET?</span>
-                            <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+                    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+                        <div>
+                            <label className="font-mono" style={{ fontSize: "0.65rem", color: "var(--grey-300)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 5 }}>
+                                Email Address
+                            </label>
+                            <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="cadet@mission.space" style={inputStyle("email")} autoComplete="email" />
+                            {errors.email && <span className="font-mono" style={{ fontSize: "0.62rem", color: "var(--red-400)", marginTop: 4, display: "block" }}>{errors.email}</span>}
                         </div>
 
-                        <Link
-                            to="/register"
-                            style={{
-                                display: "block",
-                                textAlign: "center",
-                                fontFamily: "var(--font-body)",
-                                fontSize: "0.88rem",
-                                color: "var(--cyan-400)",
-                                textDecoration: "none",
-                                transition: "color 0.2s",
-                            }}
-                            onMouseEnter={(e) => (e.target.style.color = "var(--white)")}
-                            onMouseLeave={(e) => (e.target.style.color = "var(--cyan-400)")}
-                        >
-                            → Register as a new Cadet
-                        </Link>
+                        <div>
+                            <label className="font-mono" style={{ fontSize: "0.65rem", color: "var(--grey-300)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 5 }}>
+                                Password
+                            </label>
+                            <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="••••••••" style={inputStyle("password")} autoComplete="current-password" />
+                            {errors.password && <span className="font-mono" style={{ fontSize: "0.62rem", color: "var(--red-400)", marginTop: 4, display: "block" }}>{errors.password}</span>}
+                        </div>
+
+                        <div style={{ marginTop: "0.25rem" }}>
+                            <Button type="submit" variant="primary" disabled={submitting} style={{ width: "100%", padding: "14px 24px", fontSize: "0.85rem" }}>
+                                {submitting ? "AUTHENTICATING..." : "🔓 ACCESS MISSION CONTROL"}
+                            </Button>
+                        </div>
+                    </form>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "1.5rem 0" }}>
+                        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+                        <span className="font-mono" style={{ fontSize: "0.65rem", color: "var(--grey-400)" }}>NEW CADET?</span>
+                        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
                     </div>
-                </CornerBrackets>
+
+                    <Link
+                        to="/register"
+                        style={{
+                            display: "block",
+                            textAlign: "center",
+                            fontFamily: "var(--font-body)",
+                            fontSize: "0.88rem",
+                            color: "var(--cyan-400)",
+                            textDecoration: "none",
+                        }}
+                    >
+                        → Register as a new Cadet
+                    </Link>
+                </div>
 
                 {/* Back to landing */}
                 <div style={{ textAlign: "center", marginTop: "2rem" }}>
                     <a
                         href="/"
                         className="font-mono"
-                        style={{ fontSize: "0.72rem", color: "var(--grey-400)", textDecoration: "none", letterSpacing: "0.08em", transition: "color 0.2s" }}
-                        onMouseEnter={(e) => (e.target.style.color = "var(--white)")}
-                        onMouseLeave={(e) => (e.target.style.color = "var(--grey-400)")}
+                        style={{ fontSize: "0.72rem", color: "var(--grey-400)", textDecoration: "none", letterSpacing: "0.08em" }}
                     >
                         ← BACK TO MISSION BRIEFING
                     </a>

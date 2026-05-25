@@ -3,19 +3,11 @@ import { authAPI } from "../api/auth";
 
 export const AuthContext = createContext(null);
 
-/**
- * AuthProvider — wraps the app and provides:
- * - user object
- * - isAuthenticated flag
- * - login / register / logout functions
- * - loading state during initial token check
- */
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    // ── On mount: check for stored tokens and fetch user profile ──────
     useEffect(() => {
         const initAuth = async () => {
             const accessToken = localStorage.getItem("access_token");
@@ -25,13 +17,12 @@ export const AuthProvider = ({ children }) => {
             }
 
             try {
-                const response = await authAPI.getProfile();
-                if (response?.data) {
-                    setUser(response.data);
+                const userData = await authAPI.getProfile();
+                if (userData) {
+                    setUser(userData);
                     setIsAuthenticated(true);
                 }
             } catch {
-                // Token invalid/expired — clear storage
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
                 localStorage.removeItem("user");
@@ -45,15 +36,12 @@ export const AuthProvider = ({ children }) => {
 
     // ── Login ─────────────────────────────────────────────────────────
     const login = useCallback(async (email, password) => {
-        const data = await authAPI.login(email, password);
+        const tokens = await authAPI.login(email, password);
 
-        // Store tokens
-        localStorage.setItem("access_token", data.access);
-        localStorage.setItem("refresh_token", data.refresh);
+        localStorage.setItem("access_token", tokens.access);
+        localStorage.setItem("refresh_token", tokens.refresh);
 
-        // Fetch user profile
-        const profileResponse = await authAPI.getProfile();
-        const userData = profileResponse.data;
+        const userData = await authAPI.getProfile();
 
         setUser(userData);
         setIsAuthenticated(true);
@@ -64,18 +52,18 @@ export const AuthProvider = ({ children }) => {
 
     // ── Register ──────────────────────────────────────────────────────
     const register = useCallback(async (userData) => {
+        // authAPI.register now returns { user, tokens: { access, refresh } }
         const data = await authAPI.register(userData);
 
-        // Tokens returned immediately after registration
         localStorage.setItem("access_token", data.tokens.access);
         localStorage.setItem("refresh_token", data.tokens.refresh);
 
-        const userData2 = data.user;
-        setUser(userData2);
+        const newUser = data.user;
+        setUser(newUser);
         setIsAuthenticated(true);
-        localStorage.setItem("user", JSON.stringify(userData2));
+        localStorage.setItem("user", JSON.stringify(newUser));
 
-        return userData2;
+        return newUser;
     }, []);
 
     // ── Logout ────────────────────────────────────────────────────────
@@ -85,7 +73,7 @@ export const AuthProvider = ({ children }) => {
             try {
                 await authAPI.logout(refreshToken);
             } catch {
-                // Silent fail — token may already be invalid
+                // Silent fail
             }
         }
 
@@ -96,7 +84,7 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
     }, []);
 
-    // ── Update user in context (after profile edit) ───────────────────
+    // ── Update user in context ────────────────────────────────────────
     const updateUser = useCallback((userData) => {
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));

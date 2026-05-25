@@ -1,22 +1,21 @@
 import api from "./axios";
 
-/**
- * Auth API service — all auth-related network calls.
- */
-
 export const authAPI = {
     /**
      * Register a new user.
      * POST /api/users/register/
+     * Django response: { success, data: { user, tokens: { access, refresh } }, message }
      */
     register: async (userData) => {
         const { data } = await api.post("/users/register/", userData);
-        return data; // { user, tokens: { access, refresh }, message }
+        // Return the inner 'data' object which contains user + tokens
+        return data.data; // { user, tokens: { access, refresh } }
     },
 
     /**
      * Login with email + password.
      * POST /api/auth/token/
+     * SimpleJWT response: { access, refresh }
      */
     login: async (email, password) => {
         const { data } = await api.post("/auth/token/", { email, password });
@@ -26,10 +25,11 @@ export const authAPI = {
     /**
      * Fetch authenticated user's profile.
      * GET /api/users/profile/
+     * Django response: { success, data: { ...user } }
      */
     getProfile: async () => {
         const { data } = await api.get("/users/profile/");
-        return data; // { success: true, data: { ...user } }
+        return data.data; // { id, email, first_name, ... }
     },
 
     /**
@@ -38,7 +38,7 @@ export const authAPI = {
      */
     updateProfile: async (profileData) => {
         const { data } = await api.patch("/users/profile/", profileData);
-        return data;
+        return data; // { success, data: { ...user }, message }
     },
 
     /**

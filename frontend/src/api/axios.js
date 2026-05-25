@@ -1,13 +1,5 @@
 import axios from "axios";
 
-/**
- * Axios instance pre-configured with:
- * - Base URL from .env
- * - JSON content type
- * - Automatic access token injection
- * - 401 interceptor for token refresh
- */
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
 
 const api = axios.create({
@@ -15,6 +7,7 @@ const api = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
+    withCredentials: false,  // JWT is in Authorization header, not cookies
 });
 
 // ── Request interceptor: attach access token ──────────────────────────
@@ -49,10 +42,8 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // If 401 and not already retried, attempt token refresh
         if (error.response?.status === 401 && !originalRequest._retry) {
             if (isRefreshing) {
-                // Queue request while refresh is in progress
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
                 })
@@ -68,7 +59,6 @@ api.interceptors.response.use(
 
             const refreshToken = localStorage.getItem("refresh_token");
             if (!refreshToken) {
-                // No refresh token — force logout
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
                 localStorage.removeItem("user");

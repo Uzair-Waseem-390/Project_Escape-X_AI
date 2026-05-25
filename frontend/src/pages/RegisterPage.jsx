@@ -34,7 +34,6 @@ const RegisterPage = () => {
         return () => clearTimeout(t);
     }, []);
 
-    // Redirect if already logged in
     useEffect(() => {
         if (isAuthenticated) navigate("/dashboard", { replace: true });
     }, [isAuthenticated, navigate]);
@@ -42,7 +41,6 @@ const RegisterPage = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
-        // Clear field error on change
         if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
     };
 
@@ -65,6 +63,7 @@ const RegisterPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setServerError("");
+        setErrors({});
         if (!validate()) return;
 
         setSubmitting(true);
@@ -80,17 +79,32 @@ const RegisterPage = () => {
             });
             navigate("/dashboard", { replace: true });
         } catch (err) {
-            const data = err.response?.data;
-            if (data && typeof data === "object") {
-                // Collect field-level errors from Django
-                const fieldErrors = {};
-                Object.entries(data).forEach(([key, value]) => {
-                    fieldErrors[key] = Array.isArray(value) ? value[0] : value;
-                });
-                setErrors((prev) => ({ ...prev, ...fieldErrors }));
-                setServerError("Please fix the errors below.");
+            console.error("Registration error:", err);
+
+            const responseData = err.response?.data;
+
+            if (responseData) {
+                // Backend returns: { success, error, details: { field: [messages] } }
+                if (responseData.details && typeof responseData.details === "object") {
+                    const fieldErrors = {};
+                    Object.entries(responseData.details).forEach(([key, value]) => {
+                        fieldErrors[key] = Array.isArray(value) ? value[0] : value;
+                    });
+                    setErrors(fieldErrors);
+                }
+
+                // Set the main error message
+                if (responseData.error) {
+                    setServerError(responseData.error);
+                } else if (responseData.message) {
+                    setServerError(responseData.message);
+                } else {
+                    setServerError("Please fix the errors below.");
+                }
+            } else if (err.response?.status === 0 || !err.response) {
+                setServerError("Cannot reach Mission Control. Is the backend running on port 8000?");
             } else {
-                setServerError(data?.message || data?.detail || "Registration failed. Please try again.");
+                setServerError("Registration failed. Please try again.");
             }
         } finally {
             setSubmitting(false);
