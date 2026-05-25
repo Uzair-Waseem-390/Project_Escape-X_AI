@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
 import GeminiKeyPage from "./pages/GeminiKeyPage";
+import Dashboard from "./pages/Dashboard";
 import LevelIntro from "./pages/LevelIntro";
 import LevelPlayPage from "./pages/LevelPlayPage";
 import LevelSuccess from "./pages/LevelSuccess";
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/gemini-key" element={<GeminiKeyPage />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/level/:id/intro" element={<LevelIntro />} />
           <Route path="/level/:id/play" element={<LevelPlayPage />} />
           <Route path="/level/:id/success" element={<LevelSuccess />} />
