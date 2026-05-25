@@ -54,8 +54,8 @@ const NAV_COLS = [
   {
     title: "Operations",
     links: [
-      { label: "Start Mission", href: "#" },
-      { label: "Student Login", href: "#" },
+      { label: "Start Mission", href: "/register" },
+      { label: "Student Login", href: "/login" },
     ],
   },
 ];

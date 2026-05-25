@@ -84,13 +84,12 @@ const SubjectCard = ({ subject, index }) => {
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "translateX(0)" : "translateX(-20px)",
-        transition: `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`,
+        transition: `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s, border-color 0.3s, background 0.3s`,
         background: expanded ? "#15181e" : "var(--bg-card)",
         border: `1px solid ${expanded ? subject.color + "44" : "rgba(255,255,255,0.06)"}`,
         borderRadius: 6,
         overflow: "hidden",
         cursor: "pointer",
-        transition: `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s, border-color 0.3s, background 0.3s`,
       }}
     >
       {/* Header row */}
@@ -124,7 +123,6 @@ const SubjectCard = ({ subject, index }) => {
         </div>
 
         <div style={{ flex: 1 }}>
-          {/* HUD label */}
           <div
             className="font-mono"
             style={{ fontSize: "0.6rem", color: subject.color, letterSpacing: "0.15em", marginBottom: 3 }}

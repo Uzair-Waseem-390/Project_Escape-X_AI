@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "../ui/UIKit";
 
 /**
@@ -174,11 +175,38 @@ const Navbar = () => {
           })}
         </ul>
 
-        {/* CTA */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <Button href="#" variant="primary" className="hidden-mobile" style={{ padding: "10px 20px", fontSize: "0.75rem" }}>
-            Launch Mission
-          </Button>
+        {/* CTA — Login + Register buttons */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.55rem" }}>
+          <Link
+            to="/login"
+            className="btn-primary hidden-mobile"
+            style={{
+              padding: "8px 18px",
+              fontSize: "0.7rem",
+              letterSpacing: "0.08em",
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            LOGIN
+          </Link>
+          <Link
+            to="/register"
+            className="btn-primary hidden-mobile"
+            style={{
+              padding: "8px 18px",
+              fontSize: "0.7rem",
+              letterSpacing: "0.08em",
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            REGISTER
+          </Link>
 
           {/* Mobile hamburger */}
           <button
@@ -234,9 +262,45 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
-          <Button href="#" variant="primary" style={{ width: "100%", marginTop: "1rem" }}>
-            Launch Mission
-          </Button>
+          {/* Mobile CTA buttons */}
+          <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
+            <Link
+              to="/login"
+              className="btn-primary"
+              onClick={() => setMenuOpen(false)}
+              style={{
+                flex: 1,
+                padding: "10px 16px",
+                fontSize: "0.72rem",
+                letterSpacing: "0.06em",
+                textDecoration: "none",
+                textAlign: "center",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              LOGIN
+            </Link>
+            <Link
+              to="/register"
+              className="btn-primary"
+              onClick={() => setMenuOpen(false)}
+              style={{
+                flex: 1,
+                padding: "10px 16px",
+                fontSize: "0.72rem",
+                letterSpacing: "0.06em",
+                textDecoration: "none",
+                textAlign: "center",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              REGISTER
+            </Link>
+          </div>
         </div>
       )}
 

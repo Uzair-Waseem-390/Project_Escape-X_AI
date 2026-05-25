@@ -1,9 +1,26 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
 import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import ProfilePage from "./pages/ProfilePage";
+import GeminiKeyPage from "./pages/GeminiKeyPage";
 
 /**
- * App — Root component.
- * All routing will live here once game pages are added.
+ * App — Root component with routing.
  */
 export default function App() {
-  return <LandingPage />;
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/gemini-key" element={<GeminiKeyPage />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  );
 }
