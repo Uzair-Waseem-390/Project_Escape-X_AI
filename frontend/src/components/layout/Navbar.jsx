@@ -6,11 +6,11 @@ import { Button } from "../ui/UIKit";
  * Highlights active section on scroll.
  */
 const NAV_LINKS = [
-  { label: "Mission", href: "#mission" },
+  { label: "Mission", href: "#" },
   { label: "How It Works", href: "#how-it-works" },
-  { label: "Features", href: "#features" },
+  { label: "AI Copilot", href: "#ai-section" },
   { label: "Subjects", href: "#subjects" },
-  { label: "AI Intel", href: "#ai" },
+  { label: "Features", href: "#features" },
 ];
 
 const Navbar = () => {
@@ -23,7 +23,12 @@ const Navbar = () => {
       setScrolled(window.scrollY > 40);
 
       // Active section detection
-      const sections = NAV_LINKS.map((l) => l.href.slice(1));
+      const sections = NAV_LINKS.map((l) => l.href.slice(1)).filter(Boolean);
+      // "Mission" is # (top of page) — always consider active when at top
+      if (window.scrollY < 100) {
+        setActiveSection("");
+        return;
+      }
       for (let i = sections.length - 1; i >= 0; i--) {
         const el = document.getElementById(sections[i]);
         if (el && el.getBoundingClientRect().top <= 100) {
@@ -133,9 +138,13 @@ const Navbar = () => {
           className="hidden-mobile"
         >
           {NAV_LINKS.map((link) => {
-            const isActive = activeSection === link.href.slice(1);
+            const sectionId = link.href.slice(1);
+            // Mission (#) is active when no section is highlighted (at top of page)
+            const isActive = sectionId === ""
+              ? activeSection === ""
+              : activeSection === sectionId;
             return (
-              <li key={link.href}>
+              <li key={link.href + link.label}>
                 <a
                   href={link.href}
                   className="font-heading"
@@ -203,7 +212,7 @@ const Navbar = () => {
         >
           <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
             {NAV_LINKS.map((link) => (
-              <li key={link.href}>
+              <li key={link.href + link.label}>
                 <a
                   href={link.href}
                   className="font-heading"

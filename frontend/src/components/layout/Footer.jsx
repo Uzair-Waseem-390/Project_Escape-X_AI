@@ -46,17 +46,9 @@ const NAV_COLS = [
   {
     title: "Mission",
     links: [
-      { label: "About Project", href: "#mission" },
+      { label: "About Project", href: "#" },
       { label: "How It Works", href: "#how-it-works" },
       { label: "Features", href: "#features" },
-    ],
-  },
-  {
-    title: "Intel",
-    links: [
-      { label: "STEM Subjects", href: "#subjects" },
-      { label: "AI Assistant", href: "#ai" },
-      { label: "Performance", href: "#analytics" },
     ],
   },
   {
@@ -64,7 +56,6 @@ const NAV_COLS = [
     links: [
       { label: "Start Mission", href: "#" },
       { label: "Student Login", href: "#" },
-      { label: "Contact", href: "mailto:uzairwaseem390@gmail.com" },
     ],
   },
 ];
@@ -100,7 +91,7 @@ const Footer = () => (
           margin: "0 auto",
           padding: "4rem 1.5rem 2rem",
           display: "grid",
-          gridTemplateColumns: "2fr 1fr 1fr 1fr",
+          gridTemplateColumns: "2fr 1fr 1fr",
           gap: "3rem",
         }}
         className="footer-grid"
