@@ -34,27 +34,20 @@ export const AuthProvider = ({ children }) => {
         initAuth();
     }, []);
 
-    // ── Login ─────────────────────────────────────────────────────────
     const login = useCallback(async (email, password) => {
         const tokens = await authAPI.login(email, password);
-
         localStorage.setItem("access_token", tokens.access);
         localStorage.setItem("refresh_token", tokens.refresh);
 
         const userData = await authAPI.getProfile();
-
         setUser(userData);
         setIsAuthenticated(true);
         localStorage.setItem("user", JSON.stringify(userData));
-
         return userData;
     }, []);
 
-    // ── Register ──────────────────────────────────────────────────────
     const register = useCallback(async (userData) => {
-        // authAPI.register now returns { user, tokens: { access, refresh } }
         const data = await authAPI.register(userData);
-
         localStorage.setItem("access_token", data.tokens.access);
         localStorage.setItem("refresh_token", data.tokens.refresh);
 
@@ -62,19 +55,13 @@ export const AuthProvider = ({ children }) => {
         setUser(newUser);
         setIsAuthenticated(true);
         localStorage.setItem("user", JSON.stringify(newUser));
-
         return newUser;
     }, []);
 
-    // ── Logout ────────────────────────────────────────────────────────
     const logout = useCallback(async () => {
         const refreshToken = localStorage.getItem("refresh_token");
         if (refreshToken) {
-            try {
-                await authAPI.logout(refreshToken);
-            } catch {
-                // Silent fail
-            }
+            try { await authAPI.logout(refreshToken); } catch { }
         }
 
         localStorage.removeItem("access_token");
@@ -84,7 +71,6 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
     }, []);
 
-    // ── Update user in context ────────────────────────────────────────
     const updateUser = useCallback((userData) => {
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
